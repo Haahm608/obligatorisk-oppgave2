@@ -1,11 +1,24 @@
 <?php
-include("db-tilkobling.php");
+/* slett-klasse.php */
+
+// Kobling til USN-database
+$host = "b-studentsql-1.usn.no";
+$username = "haahm5273";
+$password = "eef1haahm5273"; // passordet ditt
+$database = "haahm5273";
+
+// Forsøk tilkobling
+$db = mysqli_connect($host, $username, $password, $database);
+if (!$db) {
+    die("<p style='color:red;'>Feil ved tilkobling til databasen: " . mysqli_connect_error() . "</p>");
+}
+mysqli_set_charset($db, "utf8mb4");
 ?>
 
 <!DOCTYPE html>
 <html lang="no">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <title>Slett klasse</title>
 <script>
 function bekreft() {
@@ -22,7 +35,7 @@ function bekreft() {
     <select name="klassekode" id="klassekode" required>
         <option value="">Velg klasse</option>
         <?php
-        // Fyll select med klasser fra DB (enkelt, trygg SELECT)
+        // Hent alle klasser fra databasen
         $sql = "SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode";
         $res = mysqli_query($db, $sql);
         if ($res) {
@@ -33,7 +46,7 @@ function bekreft() {
             }
             mysqli_free_result($res);
         } else {
-            echo "<option value=''>Feil ved henting</option>";
+            echo "<option value=''>Feil ved henting av klasser</option>";
         }
         ?>
     </select>
@@ -45,31 +58,26 @@ function bekreft() {
 
 <?php
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["slettklasseKnapp"])) {
-    echo "<h4>POST-data mottatt:</h4><pre>" . print_r($_POST, true) . "</pre>";
 
+    // Hent valgt klassekode
     $klassekode = strtoupper(trim($_POST["klassekode"] ?? ''));
 
     if ($klassekode === '') {
         echo "<p style='color:red;'>Du må velge en klasse.</p>";
     } else {
-        // Sjekk om det finnes studenter i klassen
-        $sqlSjekk = "SELECT COUNT(*) as cnt FROM student WHERE klassekode = ?";
+        // Sjekk om klassen har registrerte studenter
+        $sqlSjekk = "SELECT COUNT(*) AS antall FROM student WHERE klassekode = ?";
         $stmt = mysqli_prepare($db, $sqlSjekk);
         mysqli_stmt_bind_param($stmt, "s", $klassekode);
         mysqli_stmt_execute($stmt);
-        mysqli_stmt_bind_result($stmt, $cnt);
+        mysqli_stmt_bind_result($stmt, $antall);
         mysqli_stmt_fetch($stmt);
         mysqli_stmt_close($stmt);
 
-        if ($cnt > 0) {
-            echo "<p style='color:red;'>❌ Kan ikke slette klasse <b>$klassekode</b> fordi den har $cnt registrerte studenter.</p>";
-            echo "<p>Hvis du ønsker å fjerne klassen inklusive studenter, se alternativer under.</p>";
-            echo "<ul>
-                    <li>Alternativ A: Fjern eller flytt studentene før sletting.</li>
-                    <li>Alternativ B: Slett studentene automatisk (se SQL-kommando lenger ned).</li>
-                  </ul>";
+        if ($antall > 0) {
+            echo "<p style='color:red;'>❌ Kan ikke slette klasse <b>$klassekode</b> fordi den har $antall registrerte studenter.</p>";
         } else {
-            // Utfør sletting (prepared)
+            // Slett klassen
             $sqlSlett = "DELETE FROM klasse WHERE klassekode = ?";
             $stmt2 = mysqli_prepare($db, $sqlSlett);
             mysqli_stmt_bind_param($stmt2, "s", $klassekode);
@@ -77,19 +85,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["slettklasseKnapp"])) 
                 if (mysqli_stmt_affected_rows($stmt2) > 0) {
                     echo "<p style='color:green;'>✅ Klassen <b>$klassekode</b> er nå slettet.</p>";
                 } else {
-                    echo "<p style='color:orange;'>Ingen rad ble slettet (finnes kanskje ikke).</p>";
+                    echo "<p style='color:orange;'>Ingen rad ble slettet (klassen finnes kanskje ikke).</p>";
                 }
             } else {
-                // Dersom MySQL blokkerer sletting pga FK, mysqli_error viser det
                 echo "<p style='color:red;'>Feil ved sletting: " . mysqli_error($db) . "</p>";
             }
             mysqli_stmt_close($stmt2);
         }
     }
 }
+mysqli_close($db);
 ?>
 
 </body>
 </html>
+
 
 
