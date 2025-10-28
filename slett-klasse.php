@@ -1,18 +1,8 @@
 <?php
 /* slett-klasse.php */
 
-// Kobling til USN-database
-$host = "b-studentsql-1.usn.no";
-$username = "haahm5273";
-$password = "eef1haahm5273"; // passordet ditt
-$database = "haahm5273";
-
-// Forsøk tilkobling
-$db = mysqli_connect($host, $username, $password, $database);
-if (!$db) {
-    die("<p style='color:red;'>Feil ved tilkobling til databasen: " . mysqli_connect_error() . "</p>");
-}
-mysqli_set_charset($db, "utf8mb4");
+// Inkluder din databasekobling
+include("db-tilkobling.php");
 ?>
 
 <!DOCTYPE html>
@@ -59,13 +49,12 @@ function bekreft() {
 <?php
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["slettklasseKnapp"])) {
 
-    // Hent valgt klassekode
     $klassekode = strtoupper(trim($_POST["klassekode"] ?? ''));
 
     if ($klassekode === '') {
         echo "<p style='color:red;'>Du må velge en klasse.</p>";
     } else {
-        // Sjekk om klassen har registrerte studenter
+        // Sjekk om det finnes registrerte studenter i klassen
         $sqlSjekk = "SELECT COUNT(*) AS antall FROM student WHERE klassekode = ?";
         $stmt = mysqli_prepare($db, $sqlSjekk);
         mysqli_stmt_bind_param($stmt, "s", $klassekode);
@@ -99,6 +88,7 @@ mysqli_close($db);
 
 </body>
 </html>
+
 
 
 
