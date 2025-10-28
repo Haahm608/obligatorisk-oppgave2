@@ -74,5 +74,3 @@ if (isset($_POST["registrerStudentKnapp"])) {
  
 </body>
 </html>
- 
- 
