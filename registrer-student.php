@@ -57,12 +57,12 @@ if (isset($_POST["registrerStudentKnapp"])) {
     Brukernavn: <input type="text" name="brukernavn" maxlength="7" required><br><br>
     Fornavn: <input type="text" name="fornavn" maxlength="50" required><br><br>
     Etternavn: <input type="text" name="etternavn" maxlength="50" required><br><br>
-    Klassekode:
+    Klassekode: 
     <select name="klassekode" required>
         <option value="">Velg klasse</option>
-        <?php
-            include("dynamiske-funksjoner.php");
-            listeboksKlassekode();
+        <?php 
+            include("dynamiske-funksjoner.php"); 
+            listeboksKlassekode(); 
         ?>
     </select><br><br>
     <input type="submit" name="registrerStudentKnapp" value="Registrer student">

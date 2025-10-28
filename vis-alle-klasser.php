@@ -11,7 +11,6 @@ $antall = mysqli_num_rows($resultat);
 <head>
 <meta charset="UTF-8">
 <title>Vis alle klasser</title>
-<link rel="stylesheet" href="style.css">
 </head>
 <body>
  
@@ -43,4 +42,3 @@ if ($antall == 0) {
  
 </body>
 </html>
- 
