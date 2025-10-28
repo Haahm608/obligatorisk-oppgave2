@@ -1,149 +1,44 @@
 <?php
-
-/*
-
-* Programmet lager et skjema for å kunne slette en klasse
-
-* Programmet sletter den valgte klassen
-
-*/
- 
-// Inkluder database-tilkobling FØRST
-
-include("db-tilkobling.php");
-
+/* slett-klasse */
 ?>
-<script>
-
-function bekreft() {
-
-    var klassekode = document.getElementById("klassekode").value;
-
-    if (klassekode == "") {
-
-        alert("Velg en klasse å slette");
-
-        return false;
-
-    }
-
-    return confirm("Er du sikker på at du vil slette denne klassen? ALLE STUDENTER I DENNE KLASSEN VIL BLI SLETTET!");
-
-}
-</script>
- 
-<!DOCTYPE html>
-<html lang="no">
-<head>
-<meta charset="UTF-8">
-<title>Slett klasse</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
- 
+<script src="funksjoner.js"></script>
 <h3>Slett klasse</h3>
 <form method="post" action="" id="slettklasseSkjema" name="slettklasseSkjema" onSubmit="return bekreft()">
-
-    Klasse: 
-<select name="klassekode" id="klassekode" required>
-<option value="">Velg klasse</option>
-<?php 
-
-        // Bygg listeboksen direkte
-
-        $sql = "SELECT * FROM klasse ORDER BY klassekode";
-
-        $resultat = mysqli_query($db, $sql);
-
-        if ($resultat && mysqli_num_rows($resultat) > 0) {
-
-            while ($rad = mysqli_fetch_array($resultat)) {
-
-                $kode = $rad["klassekode"];
-
-                $navn = $rad["klassenavn"];
-
-                echo "<option value='$kode'>$kode - $navn</option>";
-
-            }
-
-        } else {
-
-            echo "<option value=''>Ingen klasser funnet</option>";
-
-        }
-
-        ?>
-</select> <br/><br/>
+Klasse
+<select name="klassekode" id="klassekode">
+<?php
+print("<option value=''>velg klasse </option>");
+include("dynamiske-funksjoner.php");
+listeboksklassekode();
+?>
+</select> <br/>
 <input type="submit" value="Slett klasse" name="slettklasseKnapp" id="slettklasseKnapp" />
 </form>
  
 <?php
-
 if (isset($_POST["slettklasseKnapp"])) {
-
-    $klassekode = trim($_POST["klassekode"]);
-
+    $klassekode = $_POST["klassekode"];
+ 
     if (!$klassekode) {
-
-        print("<p style='color:red'>Det er ikke valgt noen klasse.</p>");
-
+        print("Det er ikke valgt noen klasse");
     } else {
-
-        // Først sjekk om klassen finnes
-
-        $sqlSjekk = "SELECT * FROM klasse WHERE klassekode='$klassekode'";
-
+        include("db-tilkobling.php");
+ 
+        // 🔹 Sjekk om klassen har registrerte studenter
+        $sqlSjekk = "SELECT * FROM student WHERE klassekode='$klassekode';";
         $resultat = mysqli_query($db, $sqlSjekk);
-
-        if (mysqli_num_rows($resultat) == 0) {
-
-            print("<p style='color:red'>Klassen finnes ikke.</p>");
-
+        $antall = mysqli_num_rows($resultat);
+ 
+        if ($antall > 0) {
+            // Klassen har studenter — ikke slett
+            print("Kan ikke slette klasse <b>$klassekode</b> fordi den har registrerte studenter.<br>");
         } else {
-
-            $rad = mysqli_fetch_array($resultat);
-
-            $klassenavn = $rad["klassenavn"];
-
-            // Slett først alle studentene i klassen
-
-            $sqlSlettStudenter = "DELETE FROM student WHERE klassekode='$klassekode'";
-
-            mysqli_query($db, $sqlSlettStudenter);
-
-            // Slett deretter klassen
-
-            $sqlSlettKlasse = "DELETE FROM klasse WHERE klassekode='$klassekode'";
-
-            if (mysqli_query($db, $sqlSlettKlasse)) {
-
-                print("<p style='color:green'>
-
-                        Klassen '$klassekode - $klassenavn' er nå slettet!<br>
-
-                        Alle studenter i denne klassen er også slettet.
-</p>");
-
-            } else {
-
-                print("<p style='color:red'>
-
-                        Feil ved sletting: " . mysqli_error($db) . "
-</p>");
-
-            }
-
+            // Klassen har ingen studenter — slett den
+            $sqlSlett = "DELETE FROM klasse WHERE klassekode='$klassekode';";
+            mysqli_query($db, $sqlSlett) or die("Ikke mulig å slette data i databasen.");
+            print("Følgende klasse er nå slettet: <b>$klassekode</b><br>");
         }
-
     }
-
 }
-
 ?>
- 
-<p><a href="index.html">Tilbake til hovedmeny</a></p>
- 
-</body>
-</html>
  
