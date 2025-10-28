@@ -10,7 +10,7 @@
 Klasse
 <select name="klassekode" id="klassekode">
 <?php print("<option value=''>velg klasse </option>");
-include("dynamiske-funksjoner.php"); listeboksklassekode(); ?>
+include("dynamiske-funksjoner.php"); listeboksKlassekode(); ?>
 </select> <br/>
 <input type="submit" value="Slett klasse" name="slettklasseKnapp" id="slettklasseKnapp" />
 </form>
