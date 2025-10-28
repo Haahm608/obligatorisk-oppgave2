@@ -33,13 +33,12 @@ function bekreft() {
 
     Klasse: 
 <select name="klassekode" id="klassekode" required>
+<option value="">Velg klasse</option>
 <?php 
-
-        print("<option value=''>Velg klasse</option>");
 
         include("dynamiske-funksjoner.php"); 
 
-        listeboksKlassekode(); // Rettet funksjonsnavn - med stor K
+        listeboksKlassekode(); // Riktig funksjonsnavn
 
         ?>
 </select> <br/>
@@ -60,11 +59,11 @@ if (isset($_POST["slettklasseKnapp"])) {
 
         include("db-tilkobling.php");
 
-        // Først hent informasjon om klassen for å vise i bekreftelse
+        // Først sjekk om klassen finnes
 
-        $sqlHentInfo = "SELECT * FROM klasse WHERE klassekode='$klassekode'";
+        $sqlSjekk = "SELECT * FROM klasse WHERE klassekode='$klassekode'";
 
-        $resultat = mysqli_query($db, $sqlHentInfo);
+        $resultat = mysqli_query($db, $sqlSjekk);
 
         if (mysqli_num_rows($resultat) == 0) {
 
@@ -80,35 +79,27 @@ if (isset($_POST["slettklasseKnapp"])) {
 
             $sqlSlettStudenter = "DELETE FROM student WHERE klassekode='$klassekode'";
 
-            $studenterSlettet = mysqli_query($db, $sqlSlettStudenter);
+            mysqli_query($db, $sqlSlettStudenter);
 
-            if (!$studenterSlettet) {
+            // Slett deretter klassen
 
-                print("<p style='color:red'>Feil ved sletting av studenter: " . mysqli_error($db) . "</p>");
+            $sqlSlettKlasse = "DELETE FROM klasse WHERE klassekode='$klassekode'";
+
+            if (mysqli_query($db, $sqlSlettKlasse)) {
+
+                print("<p style='color:green'>
+
+                        Klassen '$klassekode - $klassenavn' er nå slettet!<br>
+
+                        Alle studenter i denne klassen er også slettet.
+</p>");
 
             } else {
 
-                // Slett deretter klassen
+                print("<p style='color:red'>
 
-                $sqlSlettKlasse = "DELETE FROM klasse WHERE klassekode='$klassekode'";
-
-                if (mysqli_query($db, $sqlSlettKlasse)) {
-
-                    print("<p style='color:green'>
-
-                            Klassen '$klassekode - $klassenavn' er nå slettet!<br>
-
-                            Alle studenter i denne klassen er også slettet.
+                        Feil ved sletting: " . mysqli_error($db) . "
 </p>");
-
-                } else {
-
-                    print("<p style='color:red'>
-
-                            Feil ved sletting av klasse: " . mysqli_error($db) . "
-</p>");
-
-                }
 
             }
 
