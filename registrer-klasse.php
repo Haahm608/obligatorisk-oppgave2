@@ -2,7 +2,7 @@
 <form method="post" action="">
  
     Klassekode: 
-<input type="text" name="klassekode" maxlength="5" required>
+<input type="text" name="klassekode" maxlength="10" required>
 <br><br>
  
     Klassenavn: 
@@ -19,3 +19,4 @@
  
 <p><a href="vis-alle-klasser.php">Vis alle klasser</a></p>
 <p><a href="index.html">Tilbake til hovedmeny</a></p>
+ 
