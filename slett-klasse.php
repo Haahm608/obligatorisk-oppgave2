@@ -1,4 +1,4 @@
- <?php
+<?php
 
 /*
 
@@ -8,11 +8,9 @@
 
 */
  
-// Inkluder database-tilkobling og funksjoner FØRST
+// Inkluder database-tilkobling FØRST
 
 include("db-tilkobling.php");
-
-include("dynamiske-funksjoner.php");
 
 ?>
 <script>
@@ -34,6 +32,15 @@ function bekreft() {
 }
 </script>
  
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<title>Slett klasse</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+ 
 <h3>Slett klasse</h3>
 <form method="post" action="" id="slettklasseSkjema" name="slettklasseSkjema" onSubmit="return bekreft()">
 
@@ -42,7 +49,7 @@ function bekreft() {
 <option value="">Velg klasse</option>
 <?php 
 
-        // Bygg listeboksen direkte for å sikre at den fungerer
+        // Bygg listeboksen direkte
 
         $sql = "SELECT * FROM klasse ORDER BY klassekode";
 
@@ -67,7 +74,7 @@ function bekreft() {
         }
 
         ?>
-</select> <br/>
+</select> <br/><br/>
 <input type="submit" value="Slett klasse" name="slettklasseKnapp" id="slettklasseKnapp" />
 </form>
  
@@ -82,8 +89,6 @@ if (isset($_POST["slettklasseKnapp"])) {
         print("<p style='color:red'>Det er ikke valgt noen klasse.</p>");
 
     } else {
-
-        // Database-tilkobling er allerede inkludert øverst
 
         // Først sjekk om klassen finnes
 
@@ -136,4 +141,9 @@ if (isset($_POST["slettklasseKnapp"])) {
 }
 
 ?>
+ 
+<p><a href="index.html">Tilbake til hovedmeny</a></p>
+ 
+</body>
+</html>
  
