@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 /*
 
@@ -7,6 +7,12 @@
 * Programmet sletter den valgte klassen
 
 */
+ 
+// Inkluder database-tilkobling og funksjoner FØRST
+
+include("db-tilkobling.php");
+
+include("dynamiske-funksjoner.php");
 
 ?>
 <script>
@@ -36,9 +42,29 @@ function bekreft() {
 <option value="">Velg klasse</option>
 <?php 
 
-        include("dynamiske-funksjoner.php"); 
+        // Bygg listeboksen direkte for å sikre at den fungerer
 
-        listeboksKlassekode(); // Riktig funksjonsnavn
+        $sql = "SELECT * FROM klasse ORDER BY klassekode";
+
+        $resultat = mysqli_query($db, $sql);
+
+        if ($resultat && mysqli_num_rows($resultat) > 0) {
+
+            while ($rad = mysqli_fetch_array($resultat)) {
+
+                $kode = $rad["klassekode"];
+
+                $navn = $rad["klassenavn"];
+
+                echo "<option value='$kode'>$kode - $navn</option>";
+
+            }
+
+        } else {
+
+            echo "<option value=''>Ingen klasser funnet</option>";
+
+        }
 
         ?>
 </select> <br/>
@@ -57,7 +83,7 @@ if (isset($_POST["slettklasseKnapp"])) {
 
     } else {
 
-        include("db-tilkobling.php");
+        // Database-tilkobling er allerede inkludert øverst
 
         // Først sjekk om klassen finnes
 
