@@ -3,9 +3,9 @@
  
 // Bruk informasjonen fra phpMyAdmin
 $host = "b-studentsql-1.usn.no";
-$username = "ahabd4711";
-$password = "212dahabd4711"; // ← skriv inn passordet du bruker i phpMyAdmin
-$database = "ahabd4711";
+$username = "haahm5273";
+$password = "eef1haahm5273"; // ← skriv inn passordet du bruker i phpMyAdmin
+$database = "haahm5273";
  
 // Forsøk tilkobling
 $db = mysqli_connect($host, $username, $password, $database);
